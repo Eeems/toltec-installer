@@ -10,15 +10,28 @@
     "start": "webpack && qode ./dist/index.js",
     "debug": "webpack && qode --inspect ./dist/index.js"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
   "dependencies": {
-    "@nodegui/nodegui": "^0.25.0"
+    "@nodegui/nodegui": "^0.25.0",
+    "@types/ssh2": "^0.5.45",
+    "ssh2": "^0.8.9"
   },
   "devDependencies": {
     "@nodegui/packer": "^1.4.1",
     "@types/node": "^14.11.1",
     "clean-webpack-plugin": "^3.0.0",
     "file-loader": "^6.1.0",
+    "husky": "4.3.0",
+    "lint-staged": "10.5.2",
     "native-addon-loader": "^2.0.1",
+    "prettier": "2.2.0",
     "ts-loader": "^8.0.4",
     "typescript": "^4.0.3",
     "webpack": "^4.44.2",
