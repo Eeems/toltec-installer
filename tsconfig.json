@@ -11,7 +11,8 @@
     "alwaysStrict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "jsx": "react"
   },
   "include": ["**/*"]
 }

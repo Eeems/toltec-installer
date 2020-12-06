@@ -18,6 +18,12 @@ conn
   .on("close", () => {
     closePromises.forEach((resolve) => resolve());
     closePromises.splice(0, closePromises.length);
+    connected = false;
+  })
+  .on("end", () => {
+    closePromises.forEach((resolve) => resolve());
+    closePromises.splice(0, closePromises.length);
+    connected = false;
   })
   .on("ready", () => {
     connected = true;
@@ -28,11 +34,15 @@ conn
   });
 
 function connect(password?: string): Promise<any> {
+  if (connected) {
+    return Promise.resolve();
+  }
   var config: any = {
     host: "10.11.99.1",
     port: 22,
     username: "root",
-    readyTimeout: 5 * 1000, // 5 seconds
+    readyTimeout: 2 * 1000, // 2 seconds
+    keepaliveInterval: 2 * 1000, // 2 seconds
   };
   if (password) {
     config.password = password;
@@ -77,7 +87,11 @@ async function disconnect() {
 
 function exec(command: string): Promise<any> {
   return new Promise(function (resolve, reject) {
-    conn.exec("uptime", function (err: any, stream: any) {
+    if (!connected) {
+      reject("Not connected");
+      return;
+    }
+    conn.exec(command, function (err: any, stream: any) {
       if (err) {
         reject(err);
         return;
@@ -86,7 +100,6 @@ function exec(command: string): Promise<any> {
       const stderr: any[] = [];
       stream
         .on("close", function (code: any, signal: any) {
-          conn.end();
           resolve({ stdout, stderr, code, signal });
         })
         .on("data", function (data: any) {
@@ -99,4 +112,8 @@ function exec(command: string): Promise<any> {
   });
 }
 
-export { connect, disconnect, exec };
+function isConnected(): boolean {
+  return connected;
+}
+
+export { connect, disconnect, exec, isConnected };
