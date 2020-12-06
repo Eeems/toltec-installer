@@ -14,6 +14,8 @@ conn
       !x.done && x.reject(err);
       x.done = true;
     });
+    closePromises.forEach((resolve) => resolve());
+    closePromises.splice(0, closePromises.length);
   })
   .on("close", () => {
     closePromises.forEach((resolve) => resolve());
@@ -35,14 +37,17 @@ conn
 
 function connect(password?: string): Promise<any> {
   if (connected) {
-    return Promise.resolve();
+    return disconnect().then(() => {
+      return connect(password);
+    });
   }
   var config: any = {
     host: "10.11.99.1",
     port: 22,
     username: "root",
     readyTimeout: 2 * 1000, // 2 seconds
-    keepaliveInterval: 2 * 1000, // 2 seconds
+    keepaliveInterval: 1000, // 1 second
+    keepaliveCountMax: 2,
   };
   if (password) {
     config.password = password;
@@ -62,7 +67,11 @@ function connect(password?: string): Promise<any> {
       resolve();
       return;
     }
-    conn.connect(config);
+    try {
+      conn.connect(config);
+    } catch (error) {
+      reject(error);
+    }
   });
   connPromises.push(handlers);
   promise.then(() => {

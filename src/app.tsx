@@ -9,6 +9,8 @@ import {
 import React from "react";
 import { MemoryRouter } from "react-router";
 import AppRoutes from "./routes";
+import { useHistory } from "react-router";
+import "process";
 
 type Props = {
   setState: (State) => void;
@@ -22,7 +24,7 @@ class App extends React.Component<Props, State> {
   render() {
     return (
       <Window
-        windowTitle="Hello World!"
+        windowTitle="Toltec installer"
         minSize={{ width: 800, height: 250 }}
         styleSheet={styleSheet}
       >
@@ -44,4 +46,8 @@ const containerStyle = `
 const styleSheet = `
 `;
 
+process.on("uncaughtException", function (error: string) {
+  const history = useHistory();
+  history.replace("/error", { error });
+});
 export default hot(App);

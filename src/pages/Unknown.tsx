@@ -7,7 +7,7 @@ export default function Error() {
   const history = useHistory();
   const location = useLocation();
   function handleClick() {
-    history.push("/intro");
+    history.replace("/intro");
   }
   React.useEffect(() => {
     console.log(`Unknown route`);
@@ -20,13 +20,13 @@ export default function Error() {
         justify-content: 'center';
       `}
     >
-      <Text>Error Page</Text>
       <Text>Something went wrong!</Text>
       <Text wordWrap={true}>
         The application ran into an unknown error, please open an issue and
-        provide the following information:{" "}
-        {location.pathname + location.search + location.hash}
+        provide the following information:
       </Text>
+      <Text>{location.pathname + location.search + location.hash}</Text>
+      <Text wordWrap={true}>{JSON.stringify(location.state)}</Text>
       <Button on={{ clicked: handleClick }} text="Restart"></Button>
     </View>
   );

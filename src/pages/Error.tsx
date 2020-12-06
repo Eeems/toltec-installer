@@ -1,17 +1,14 @@
 import React from "react";
 import { Text, View, Button } from "@nodegui/react-nodegui";
-import { useHistory, useParams } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { QPushButtonSignals } from "@nodegui/nodegui";
 
 export default function Error() {
   const history = useHistory();
-  const { error } = useParams();
+  const location = useLocation();
   function handleClick() {
     history.push("/intro");
   }
-  React.useEffect(() => {
-    console.log("Error detected...");
-  }, []);
   return (
     <View
       style={`
@@ -20,9 +17,13 @@ export default function Error() {
         justify-content: 'center';
       `}
     >
-      <Text>Error Page</Text>
       <Text>Something went wrong!</Text>
-      <Text wordWrap={true}>{JSON.parse(error) || "Unknown Error"}</Text>
+      <Text wordWrap={true}>{location.state.error}</Text>
+      <Text>
+        You may need to open an issue to get help. If you do, please include the
+        following information:
+      </Text>
+      <Text wordWrap={true}>{JSON.stringify(location.state)}</Text>
       <Button on={{ clicked: handleClick }} text="Restart"></Button>
     </View>
   );
