@@ -9,7 +9,6 @@ import {
 import React from "react";
 import { MemoryRouter } from "react-router";
 import AppRoutes from "./routes";
-import { useHistory } from "react-router";
 import "process";
 
 type Props = {
@@ -29,7 +28,7 @@ class App extends React.Component<Props, State> {
         styleSheet={styleSheet}
       >
         <MemoryRouter>
-          <View style={containerStyle}>
+          <View id="rootView">
             <AppRoutes />
           </View>
         </MemoryRouter>
@@ -37,17 +36,25 @@ class App extends React.Component<Props, State> {
     );
   }
 }
-
-const containerStyle = `
-  flex: 1;
-  height: '100%';
-`;
-
 const styleSheet = `
+  #rootView {
+    height: '100%';
+    width: '100%';
+    background-color: 'red';
+  }
+  #rootView > * {
+    flex: 1;
+    flex-direction: 'column';
+    background-color: 'blue';
+    height: '100%';
+  }
+  #rootView > * > * {
+    background-color: 'green';
+  }
+  #bottomBar {
+    flex-direction: 'row';
+    justify-content: 'space-between';
+    padding: 5px;
+  }
 `;
-
-process.on("uncaughtException", function (error: string) {
-  const history = useHistory();
-  history.replace("/error", { error });
-});
 export default hot(App);

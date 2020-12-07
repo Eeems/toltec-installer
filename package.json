@@ -8,7 +8,7 @@
   "scripts": {
     "build": "webpack -p",
     "dev": "webpack --mode=development",
-    "start": "qode ./dist/index.js",
+    "start": "qode --trace-deprecation ./dist/index.js",
     "debug": "qode --inspect ./dist/index.js"
   },
   "husky": {
@@ -26,9 +26,6 @@
     "@babel/preset-typescript": "^7.12.7",
     "@nodegui/nodegui": "^0.25.0",
     "@nodegui/react-nodegui": "^0.9.0",
-    "@types/react": "^17.0.0",
-    "@types/ssh2": "^0.5.45",
-    "@types/webpack-env": "^1.16.0",
     "babel-loader": "^8.2.2",
     "fork-ts-checker-webpack-plugin": "^6.0.5",
     "react": "^17.0.1",
@@ -37,15 +34,18 @@
   },
   "devDependencies": {
     "@nodegui/packer": "^1.4.1",
-    "@types/node": "^14.11.1",
+    "@types/node": "^14.14.10",
+    "@types/react": "^17.0.0",
+    "@types/ssh2": "^0.5.46",
+    "@types/webpack-env": "^1.16.0",
     "clean-webpack-plugin": "^3.0.0",
     "file-loader": "^6.2.0",
     "husky": "4.3.0",
     "lint-staged": "10.5.2",
     "native-addon-loader": "^2.0.1",
     "prettier": "2.2.0",
-    "ts-loader": "^8.0.4",
-    "typescript": "^4.0.3",
+    "ts-loader": "^8.0.11",
+    "typescript": "^4.1.2",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   }

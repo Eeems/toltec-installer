@@ -37,13 +37,7 @@ export default function Error() {
   };
   React.useEffect(connectToDevice, []);
   return (
-    <View
-      style={`
-        height: '100%';
-        align-items: 'center';
-        justify-content: 'center';
-      `}
-    >
+    <View>
       <Text>Looking for reMarkable...</Text>
     </View>
   );

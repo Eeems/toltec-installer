@@ -2,6 +2,7 @@ import React from "react";
 import { Text, View, Button } from "@nodegui/react-nodegui";
 import { useHistory, useLocation } from "react-router";
 import { QPushButtonSignals } from "@nodegui/nodegui";
+import Spacer from "../components/Spacer";
 
 export default function Error() {
   const history = useHistory();
@@ -9,14 +10,9 @@ export default function Error() {
   function handleClick() {
     history.push("/intro");
   }
+  console.log(location.state.error);
   return (
-    <View
-      style={`
-        height: '100%';
-        align-items: 'center';
-        justify-content: 'center';
-      `}
-    >
+    <View>
       <Text>Something went wrong!</Text>
       <Text wordWrap={true}>{location.state.error}</Text>
       <Text>
@@ -24,7 +20,11 @@ export default function Error() {
         following information:
       </Text>
       <Text wordWrap={true}>{JSON.stringify(location.state)}</Text>
-      <Button on={{ clicked: handleClick }} text="Restart"></Button>
+      <Spacer />
+      <View id="bottomBar">
+        <Spacer />
+        <Button on={{ clicked: handleClick }} text="Restart"></Button>
+      </View>
     </View>
   );
 }

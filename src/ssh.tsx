@@ -1,5 +1,6 @@
-import { Client } from "ssh2";
-import { readFileSync } from "fs";
+import { Client, SFTPWrapper } from "ssh2";
+import { Stats } from "ssh2-streams";
+import { readFileSync, mkdirSync, existsSync } from "fs";
 import { homedir } from "os";
 
 const conn = new Client();
@@ -35,7 +36,7 @@ conn
     });
   });
 
-function connect(password?: string): Promise<any> {
+function connect(password?: string): Promise<void> {
   if (connected) {
     return disconnect().then(() => {
       return connect(password);
@@ -56,10 +57,10 @@ function connect(password?: string): Promise<any> {
   }
   const handlers = {
     resolve: function () {},
-    reject: function () {},
+    reject: function (err: Error) {},
     done: false,
   };
-  const promise = new Promise(function (resolve, reject) {
+  const promise = new Promise<void>((resolve, reject) => {
     handlers.resolve = resolve;
     handlers.reject = reject;
     if (connected) {
@@ -121,8 +122,168 @@ function exec(command: string): Promise<any> {
   });
 }
 
+function copyStructure(
+  sftp: SFTPWrapper,
+  from: string,
+  to: string
+): Promise<any> {
+  return new Promise(function (resolve, reject) {
+    if (!connected) {
+      reject("Not connected");
+      return;
+    }
+    try {
+      if (!existsSync(to)) {
+        mkdirSync(to);
+      }
+    } catch (e) {
+      reject(e);
+      return;
+    }
+    sftp.readdir(from, function (err: Error | undefined, list: any) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      Promise.allSettled(
+        list.map(function (item) {
+          const fromPath = from + "/" + item.filename,
+            toPath = to + "/" + item.filename;
+          return new Promise(function (resolve, reject) {
+            sftp.stat(
+              fromPath,
+              function (err: Error | undefined, stats: Stats) {
+                if (err) {
+                  reject(err);
+                  return;
+                }
+                if (stats.isDirectory()) {
+                  copyStructure(sftp, fromPath, toPath).then(resolve, reject);
+                  return;
+                } else {
+                  resolve({ fromPath, toPath });
+                }
+              }
+            );
+          });
+        })
+      ).then((items: any) => {
+        const errors = [
+          ...new Set(
+            items
+              .filter((x) => x.status == "rejected")
+              .map((x) => "" + x.reason)
+          ),
+        ];
+        if (errors.length) {
+          console.log(`copyStructure(${from}, ${to}): failed`);
+          console.error(errors.join("\n"));
+          reject(errors.join("\n"));
+          return;
+        }
+        resolve(items.map((x) => x.value).flat());
+      }, reject);
+    });
+  });
+}
+
+const copyThreads: any[] = [];
+let copyPromise: Promise<void> | undefined = undefined;
+
+function copyThread(
+  sftp: SFTPWrapper,
+  from: string,
+  to: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    sftp.fastGet(from, to, function (err) {
+      if (err) {
+        console.log(`copyItem(${from}, ${to}): failed`);
+        console.error(err);
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+function startCopy() {
+  if (!copyPromise) {
+    copyPromise = new Promise(async (finalResolve) => {
+      const threads: Promise<void>[] = [];
+      while (copyThreads.length) {
+        while (copyThreads.length && threads.length < 5) {
+          let [sftp, from, to, resolve, reject] = copyThreads.pop();
+          threads.push(copyThread(sftp, from, to).then(resolve, reject));
+        }
+        await Promise.allSettled(threads);
+        threads.splice(0, threads.length);
+      }
+      copyPromise = undefined;
+      finalResolve();
+    });
+  }
+}
+
+function cancelCopy() {
+  while (copyThreads.length) {
+    let [sftp, from, to, resolve, reject] = copyThreads.pop();
+    resolve("Cancelled");
+  }
+}
+
+function copyItem(sftp: SFTPWrapper, from: string, to: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    copyThreads.push([sftp, from, to, resolve, reject]);
+    startCopy();
+  });
+}
+
+function copy(from: string, to: string, progress: any): Promise<void> {
+  console.log(`copy(${from}, ${to})`);
+  return new Promise((resolve, reject) => {
+    if (!connected) {
+      reject("Not connected");
+      return;
+    }
+    conn.sftp(function (err: Error | undefined, sftp: SFTPWrapper) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      copyStructure(sftp, from, to).then((items) => {
+        const total = items.length;
+        let done = 0;
+        Promise.allSettled(
+          items.map(({ fromPath, toPath }) => {
+            return copyItem(sftp, fromPath, toPath).then(() => {
+              progress(total, ++done);
+            });
+          })
+        ).then((items: any) => {
+          const errors = [
+            ...new Set(
+              items
+                .filter((x) => x.status == "rejected")
+                .map((x) => x.reason + "")
+            ),
+          ];
+          if (errors.length) {
+            console.log(`copyStructure(${from}, ${to}): failed`);
+            console.error(errors.join("\n"));
+            reject(errors.join("\n"));
+            return;
+          }
+          resolve();
+        }, reject);
+      }, reject);
+    });
+  });
+}
+
 function isConnected(): boolean {
   return connected;
 }
 
-export { connect, disconnect, exec, isConnected };
+export { connect, disconnect, exec, copy, cancelCopy, isConnected };

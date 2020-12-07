@@ -20,24 +20,19 @@ export default function Detect() {
           );
           return;
         }
-        if (machine == "reMarkable 2.0") {
-          history.replace(`/backup`, { device: "rm2" });
-        } else {
-          history.replace(`/backup`, { device: "rm1" });
-        }
+        history.replace(`/backupprompt`, {
+          device: machine == "reMarkable 2.0" ? "rm2" : "rm1",
+        });
       })
       .catch(function (error) {
-        history.replace(`/error`, Object.assign(location.state, { error }));
+        history.replace(
+          `/error`,
+          Object.assign(location.state || {}, { error })
+        );
       });
   }, []);
   return (
-    <View
-      style={`
-        height: '100%';
-        align-items: 'center';
-        justify-content: 'center';
-      `}
-    >
+    <View>
       <Text>Checking device...</Text>
     </View>
   );
