@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, View, Button } from "@nodegui/react-nodegui";
+import { Text, View, BoxView } from "@nodegui/react-nodegui";
+import { Direction } from "@nodegui/nodegui";
 import { useHistory, useLocation } from "react-router";
 import { exec } from "../ssh";
 
@@ -23,6 +24,7 @@ export default function Detect() {
         history.replace(`/backupprompt`, {
           device: machine == "reMarkable 2.0" ? "rm2" : "rm1",
         });
+        console.log(`Device: ${machine}`);
       })
       .catch(function (error) {
         history.replace(
@@ -32,8 +34,10 @@ export default function Detect() {
       });
   }, []);
   return (
-    <View>
-      <Text>Checking device...</Text>
-    </View>
+    <BoxView>
+      <View>
+        <Text>Checking device...</Text>
+      </View>
+    </BoxView>
   );
 }

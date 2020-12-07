@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, View, Button } from "@nodegui/react-nodegui";
+import { Text, View, BoxView, Button, LineEdit } from "@nodegui/react-nodegui";
+import { Direction, CursorShape } from "@nodegui/nodegui";
 import { useHistory, useLocation } from "react-router";
-import { QPushButtonSignals } from "@nodegui/nodegui";
 import Spacer from "../components/Spacer";
 
 export default function Error() {
@@ -12,19 +12,26 @@ export default function Error() {
   }
   console.log(location.state.error);
   return (
-    <View>
-      <Text>Something went wrong!</Text>
+    <BoxView direction={Direction.TopToBottom}>
+      <View>
+        <Text>Something went wrong!</Text>
+      </View>
       <Text wordWrap={true}>{location.state.error}</Text>
       <Text>
         You may need to open an issue to get help. If you do, please include the
         following information:
       </Text>
-      <Text wordWrap={true}>{JSON.stringify(location.state)}</Text>
-      <Spacer />
-      <View id="bottomBar">
-        <Spacer />
+      <LineEdit
+        readOnly={true}
+        cursor={CursorShape.IBeamCursor}
+        text={JSON.stringify(location.state)}
+      />
+      <BoxView id="bottomBar" direction={Direction.LeftToRight}>
+        <View />
+        <View />
+        <View />
         <Button on={{ clicked: handleClick }} text="Restart"></Button>
-      </View>
-    </View>
+      </BoxView>
+    </BoxView>
   );
 }

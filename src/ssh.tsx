@@ -241,7 +241,6 @@ function copyItem(sftp: SFTPWrapper, from: string, to: string): Promise<void> {
 }
 
 function copy(from: string, to: string, progress: any): Promise<void> {
-  console.log(`copy(${from}, ${to})`);
   return new Promise((resolve, reject) => {
     if (!connected) {
       reject("Not connected");

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, Button } from "@nodegui/react-nodegui";
+import { Text, BoxView, View } from "@nodegui/react-nodegui";
 import { useHistory, useLocation } from "react-router";
 import { connect } from "../ssh";
 
@@ -37,8 +37,10 @@ export default function Error() {
   };
   React.useEffect(connectToDevice, []);
   return (
-    <View>
-      <Text>Looking for reMarkable...</Text>
-    </View>
+    <BoxView>
+      <View>
+        <Text>Looking for reMarkable...</Text>
+      </View>
+    </BoxView>
   );
 }

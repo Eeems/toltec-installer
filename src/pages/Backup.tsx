@@ -1,5 +1,12 @@
 import React from "react";
-import { Text, View, Button, ProgressBar } from "@nodegui/react-nodegui";
+import {
+  Text,
+  View,
+  BoxView,
+  Button,
+  ProgressBar,
+} from "@nodegui/react-nodegui";
+import { Direction } from "@nodegui/nodegui";
 import { useHistory, useLocation } from "react-router";
 import { exec, copy, cancelCopy } from "../ssh";
 import Spacer from "../components/Spacer";
@@ -14,45 +21,47 @@ export default function Backup() {
   const history = useHistory();
   const location = useLocation();
   React.useEffect(() => {
-    copy(
-      "/home/root/.local/share/remarkable/",
-      "/tmp/rm-backup",
-      function (total: number, done: number) {
-        const value = Math.round((done / total) * 100);
-        setState({
-          value,
-          total,
-          done,
-          finished: state.finished,
-        });
-      }
-    ).then(
-      function () {
-        setState({
-          value: 100,
-          total: state.total,
-          done: state.done,
-          finished: true,
-        });
-      },
-      function (error) {
-        history.replace(
-          "/error",
-          Object.assign(location.state || {}, { error })
-        );
-      }
-    );
+    console.log("Backing up...");
+    if (!state.finished) {
+      copy(
+        "/home/root/.local/share/remarkable/",
+        "/tmp/rm-backup",
+        function (total: number, done: number) {
+          const value = Math.round((done / total) * 100);
+          setState({
+            value,
+            total,
+            done,
+            finished: state.finished,
+          });
+        }
+      ).then(
+        function () {
+          setState({
+            value: 100,
+            total: state.total,
+            done: state.done,
+            finished: true,
+          });
+        },
+        function (error) {
+          history.replace(
+            "/error",
+            Object.assign(location.state || {}, { error })
+          );
+        }
+      );
+    }
   }, []);
   const device = location.state.device;
   return (
-    <View style="flex: 1;">
+    <BoxView direction={Direction.TopToBottom}>
       <Text>Backing up your reMarkable {device[device.length - 1]}...</Text>
-      <Spacer />
       <ProgressBar value={state.value} />
       <Text>
-        {state.done}/{state.total}
+        {state.done}/{state.total || "?"}
       </Text>
-      <View id="bottomBar">
+      <BoxView direction={Direction.LeftToRight}>
         <Button
           on={{
             clicked: () => {
@@ -62,13 +71,14 @@ export default function Backup() {
           }}
           text="Cancel"
         />
-        <Spacer />
+        <View />
+        <View />
         <Button
           enabled={state.finished}
           on={{ clicked: () => history.replace("/install", location.state) }}
           text="Next"
         />
-      </View>
-    </View>
+      </BoxView>
+    </BoxView>
   );
 }

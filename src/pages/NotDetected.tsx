@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, View, Button } from "@nodegui/react-nodegui";
+import { Text, View, BoxView, Button } from "@nodegui/react-nodegui";
+import { Direction } from "@nodegui/nodegui";
 import { useHistory, useParams, useLocation } from "react-router";
 import { QPushButtonSignals } from "@nodegui/nodegui";
 import Spacer from "../components/Spacer";
@@ -14,14 +15,17 @@ export default function NotDetected() {
     console.log("Could not connect to device...");
   }, []);
   return (
-    <View>
-      <Text>Device not detected</Text>
-      <Text>Connect your reMarkable to your computer and try again.</Text>
-      <Spacer />
-      <View id="bottomBar">
-        <Spacer />
-        <Button on={{ clicked: handleClick }} text="Try again"></Button>
+    <BoxView direction={Direction.TopToBottom}>
+      <View>
+        <Text>Device not detected</Text>
+        <Text>Connect your reMarkable to your computer and try again.</Text>
       </View>
-    </View>
+      <BoxView id="bottomBar" direction={Direction.LeftToRight}>
+        <View />
+        <View />
+        <View />
+        <Button on={{ clicked: handleClick }} text="Try again"></Button>
+      </BoxView>
+    </BoxView>
   );
 }

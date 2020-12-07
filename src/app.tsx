@@ -25,6 +25,7 @@ class App extends React.Component<Props, State> {
       <Window
         windowTitle="Toltec installer"
         minSize={{ width: 800, height: 250 }}
+        maxSize={{ width: 800, height: 250 }}
         styleSheet={styleSheet}
       >
         <MemoryRouter>
@@ -40,21 +41,18 @@ const styleSheet = `
   #rootView {
     height: '100%';
     width: '100%';
-    background-color: 'red';
   }
   #rootView > * {
     flex: 1;
-    flex-direction: 'column';
-    background-color: 'blue';
     height: '100%';
   }
-  #rootView > * > * {
-    background-color: 'green';
-  }
   #bottomBar {
+    flex: 1;
     flex-direction: 'row';
     justify-content: 'space-between';
-    padding: 5px;
+    padding: '5px';
+    max-height: '50px';
+    min-height: '50px';
   }
 `;
 export default hot(App);
