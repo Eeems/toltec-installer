@@ -3,7 +3,7 @@ import { Text, BoxView, View } from "@nodegui/react-nodegui";
 import { useHistory, useLocation } from "react-router";
 import { connect } from "../ssh";
 
-export default function Error() {
+export default function Intro() {
   const history = useHistory();
   const location = useLocation();
   const catchError = (error?: string) => {
@@ -16,6 +16,10 @@ export default function Error() {
       case "Error: Timed out while waiting for handshake":
         console.log("Device not detected");
         history.replace(`/notdetected`, { error });
+        break;
+      case "Error: All configured authentication methods failed":
+        console.log("Unable to connect");
+        history.replace(`/sshpassword`);
         break;
       default:
         console.log("Unknown error");

@@ -1,6 +1,7 @@
 import { Route, Switch, useHistory } from "react-router";
 import React from "react";
 import Intro from "./pages/Intro";
+import SSHPassword from "./pages/SSHPassword";
 import Error from "./pages/Error";
 import Unknown from "./pages/Unknown";
 import Detect from "./pages/Detect";
@@ -19,6 +20,7 @@ export default function AppRoutes() {
       <Switch>
         <Route exact path="/" component={Intro} />
         <Route exact path="/intro" component={Intro} />
+        <Route exact path="/sshpassword" component={SSHPassword} />
         <Route exact path="/error" component={Error} />
         <Route exact path="/detect" component={Detect} />
         <Route exact path="/notdetected" component={NotDetected} />
