@@ -24,7 +24,7 @@ export default function Backup() {
     if (!finished) {
       copy(
         "/home/root/.local/share/remarkable/",
-        "/tmp/rm-backup",
+        location.state.backupLocation,
         function (total: number, done: number) {
           const value = Math.round((done / total) * 100);
           setCurrentValue(value);
