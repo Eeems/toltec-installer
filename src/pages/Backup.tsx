@@ -12,37 +12,29 @@ import { exec, copy, cancelCopy } from "../ssh";
 import Spacer from "../components/Spacer";
 
 export default function Backup() {
-  const [state, setState] = React.useState({
-    value: 0,
-    total: 0,
-    done: 0,
-    finished: false,
-  });
+  const [currentValue, setCurrentValue] = React.useState(0);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [itemsDone, setItemsDone] = React.useState(0);
+  const [finished, setFinished] = React.useState(false);
   const history = useHistory();
   const location = useLocation();
+
   React.useEffect(() => {
     console.log("Backing up...");
-    if (!state.finished) {
+    if (!finished) {
       copy(
         "/home/root/.local/share/remarkable/",
         "/tmp/rm-backup",
         function (total: number, done: number) {
           const value = Math.round((done / total) * 100);
-          setState({
-            value,
-            total,
-            done,
-            finished: state.finished,
-          });
+          setCurrentValue(value);
+          total && setTotalItems(total);
+          done && setItemsDone(done);
         }
       ).then(
         function () {
-          setState({
-            value: 100,
-            total: state.total,
-            done: state.done,
-            finished: true,
-          });
+          setCurrentValue(100);
+          setFinished(true);
         },
         function (error) {
           history.replace(
@@ -57,9 +49,9 @@ export default function Backup() {
   return (
     <BoxView direction={Direction.TopToBottom}>
       <Text>Backing up your reMarkable {device[device.length - 1]}...</Text>
-      <ProgressBar value={state.value} />
+      <ProgressBar value={currentValue} />
       <Text>
-        {state.done}/{state.total || "?"}
+        {itemsDone}/{totalItems || "?"}
       </Text>
       <BoxView direction={Direction.LeftToRight}>
         <Button
@@ -74,7 +66,7 @@ export default function Backup() {
         <View />
         <View />
         <Button
-          enabled={state.finished}
+          enabled={finished}
           on={{ clicked: () => history.replace("/install", location.state) }}
           text="Next"
         />
