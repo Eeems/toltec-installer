@@ -13,7 +13,6 @@ export default function FilePicker({
     selectedFilesRef.current = value;
     onChange(value);
   };
-  console.log(fileMode);
   const onClicked = () => {
     const fileDialog = new QFileDialog();
     fileMode && fileDialog.setFileMode(fileMode);
