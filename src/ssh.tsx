@@ -3,45 +3,44 @@ import { Stats } from "ssh2-streams";
 import { readFileSync, mkdirSync, existsSync } from "fs";
 import { homedir } from "os";
 
-const conn = new Client();
+let conn;
 var connected = false;
 const connPromises: any[] = [];
 const closePromises: any[] = [];
 
-conn
-  .on("error", (err: any) => {
-    connected = false;
-    connPromises.forEach((x) => {
-      !x.done && x.reject(err);
-      x.done = true;
-    });
-    closePromises.forEach((resolve) => resolve());
-    closePromises.splice(0, closePromises.length);
-  })
-  .on("close", () => {
-    closePromises.forEach((resolve) => resolve());
-    closePromises.splice(0, closePromises.length);
-    connected = false;
-  })
-  .on("end", () => {
-    closePromises.forEach((resolve) => resolve());
-    closePromises.splice(0, closePromises.length);
-    connected = false;
-  })
-  .on("ready", () => {
-    connected = true;
-    connPromises.forEach((x) => {
-      x.done = true;
-      x.resolve();
-    });
-  });
-
-function connect(password?: string): Promise<void> {
+function connect(password?: string, sshKeyPath?: string): Promise<void> {
   if (connected) {
     return disconnect().then(() => {
       return connect(password);
     });
   }
+  conn = new Client()
+    .on("error", (err: any) => {
+      connected = false;
+      connPromises.forEach((x) => {
+        !x.done && x.reject(err);
+        x.done = true;
+      });
+      closePromises.forEach((resolve) => resolve());
+      closePromises.splice(0, closePromises.length);
+    })
+    .on("close", () => {
+      closePromises.forEach((resolve) => resolve());
+      closePromises.splice(0, closePromises.length);
+      connected = false;
+    })
+    .on("end", () => {
+      closePromises.forEach((resolve) => resolve());
+      closePromises.splice(0, closePromises.length);
+      connected = false;
+    })
+    .on("ready", () => {
+      connected = true;
+      connPromises.forEach((x) => {
+        x.done = true;
+        x.resolve();
+      });
+    });
   var config: any = {
     host: "10.11.99.1",
     port: 22,
@@ -51,8 +50,13 @@ function connect(password?: string): Promise<void> {
     keepaliveCountMax: 2,
   };
   if (password) {
+    console.log("Using password");
     config.password = password;
+  } else if (sshKeyPath) {
+    console.log(`Using explicit SSH key: ${sshKeyPath}`);
+    config.privateKey = readFileSync(sshKeyPath);
   } else {
+    console.log("Using default SSH key");
     config.privateKey = readFileSync(homedir() + "/.ssh/id_rsa");
   }
   const handlers = {
@@ -137,6 +141,7 @@ function copyStructure(
         mkdirSync(to);
       }
     } catch (e) {
+      console.log(`copyStructure(${from}, ${to}): failed`);
       reject(e);
       return;
     }
@@ -243,11 +248,18 @@ function copyItem(sftp: SFTPWrapper, from: string, to: string): Promise<void> {
 function copy(from: string, to: string, progress: any): Promise<void> {
   return new Promise((resolve, reject) => {
     if (!connected) {
+      console.log(`copy(${from}, ${to}): failed`);
       reject("Not connected");
+      return;
+    }
+    if (!from || !to) {
+      console.log(`copy(${from}, ${to}): failed`);
+      reject("Invalid paths");
       return;
     }
     conn.sftp(function (err: Error | undefined, sftp: SFTPWrapper) {
       if (err) {
+        console.log(`copy(${from}, ${to}): failed`);
         reject(err);
         return;
       }
@@ -280,7 +292,6 @@ function copy(from: string, to: string, progress: any): Promise<void> {
     });
   });
 }
-
 function isConnected(): boolean {
   return connected;
 }

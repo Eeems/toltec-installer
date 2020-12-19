@@ -7,23 +7,41 @@ export default function FilePicker({
   filter = "",
   fileMode = FileMode.AnyFile,
   onChange = (x: string) => {},
+  onReturnPressed = () => {},
 }) {
   const selectedFilesRef = React.useRef(selectedFiles);
-  const onTextChanged = (value) => {
-    selectedFilesRef.current = value;
-    onChange(value);
-  };
+  const timeoutRef = React.useRef(
+    undefined as ReturnType<typeof setTimeout> | unknown
+  );
+  const onTextEdited = (value) => {};
   const onClicked = () => {
     const fileDialog = new QFileDialog();
     fileMode && fileDialog.setFileMode(fileMode);
     filter && fileDialog.setNameFilter(filter);
     if (fileDialog.exec() == DialogCode.Accepted) {
-      onTextChanged(fileDialog.selectedFiles().join(", "));
+      selectedFilesRef.current = fileDialog.selectedFiles().join(", ");
+      onChange(selectedFilesRef.current);
     }
   };
   return (
     <BoxView id="bottomBar" direction={Direction.LeftToRight}>
-      <LineEdit text={selectedFiles} on={{ textChanged: onTextChanged }} />
+      <LineEdit
+        text={selectedFiles}
+        on={{
+          textChanged: (value) => {
+            selectedFilesRef.current = value;
+            onChange(selectedFilesRef.current);
+          },
+          editingFinished: () => {
+            console.log("Editing Finished");
+            onChange(selectedFilesRef.current);
+          },
+          returnPressed: () => {
+            console.log("Return Pressed");
+            onReturnPressed();
+          },
+        }}
+      />
       <Button text="Browse" on={{ clicked: onClicked }} />
     </BoxView>
   );

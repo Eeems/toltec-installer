@@ -55,6 +55,7 @@ export default function Backup() {
       </Text>
       <BoxView direction={Direction.LeftToRight}>
         <Button
+          enabled={!finished}
           on={{
             clicked: () => {
               cancelCopy();

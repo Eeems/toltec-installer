@@ -24,7 +24,10 @@ export default function Error() {
       <LineEdit
         readOnly={true}
         cursor={CursorShape.IBeamCursor}
-        text={JSON.stringify(location.state)}
+        text={JSON.stringify({
+          state: location.state,
+          message: "" + location.state.error,
+        })}
       />
       <BoxView id="bottomBar" direction={Direction.LeftToRight}>
         <View />

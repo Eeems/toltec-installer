@@ -13,17 +13,10 @@ import Spacer from "../components/Spacer";
 import FilePicker from "../components/FilePicker";
 
 export default function BackupPrompt() {
-  const [backupLocation, setBackupLocation] = React.useState("/tmp/rm-backup");
+  const backupLocationRef = React.useRef("/tmp/rm-backup");
   const location = useLocation();
   const history = useHistory();
   const device = location.state.device;
-  const onChange = (value) => {
-    setBackupLocation(value);
-    history.replace(
-      `/backupprompt`,
-      Object.assign(location.state, { backupLocation: value })
-    );
-  };
   return (
     <BoxView direction={Direction.TopToBottom}>
       <View>
@@ -32,9 +25,11 @@ export default function BackupPrompt() {
         </Text>
       </View>
       <FilePicker
-        selectedFiles={backupLocation}
+        selectedFiles={backupLocationRef.current}
         fileMode={FileMode.Directory}
-        onChange={onChange}
+        onChange={(value) => {
+          backupLocationRef.current = value;
+        }}
       />
       <BoxView id="bottomBar" direction={Direction.LeftToRight}>
         <View />
@@ -44,7 +39,15 @@ export default function BackupPrompt() {
           text="Skip"
         />
         <Button
-          on={{ clicked: () => history.replace("/backup", location.state) }}
+          on={{
+            clicked: () =>
+              history.replace(
+                "/backup",
+                Object.assign(location.state, {
+                  backupLocation: backupLocationRef.current,
+                })
+              ),
+          }}
           text="Backup"
         />
       </BoxView>

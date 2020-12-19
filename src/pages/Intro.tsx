@@ -32,7 +32,7 @@ export default function Intro() {
     try {
       connect()
         .then(function () {
-          history.replace("/detect");
+          history.replace("/detect", { password: false });
         })
         .catch(catchError);
     } catch (error) {

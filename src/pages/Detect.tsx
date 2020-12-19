@@ -21,10 +21,16 @@ export default function Detect() {
           );
           return;
         }
+        console.log(`Device: ${machine}`);
+        if (location.state.password) {
+          history.replace(`/sshkeycreate`, {
+            device: machine == "reMarkable 2.0" ? "rm2" : "rm1",
+          });
+          return;
+        }
         history.replace(`/backupprompt`, {
           device: machine == "reMarkable 2.0" ? "rm2" : "rm1",
         });
-        console.log(`Device: ${machine}`);
       })
       .catch(function (error) {
         history.replace(
