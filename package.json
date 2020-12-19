@@ -26,11 +26,15 @@
     "@babel/preset-typescript": "^7.12.7",
     "@nodegui/nodegui": "^0.25.0",
     "@nodegui/react-nodegui": "^0.9.0",
+    "@types/node-forge": "^0.9.5",
     "babel-loader": "^8.2.2",
     "fork-ts-checker-webpack-plugin": "^6.0.5",
+    "keypair": "^1.0.1",
+    "node-forge": "^0.10.0",
     "react": "^17.0.1",
     "react-router": "^5.2.0",
-    "ssh2": "^0.8.9"
+    "ssh2": "^0.8.9",
+    "typestub-keypair": "0.0.0"
   },
   "devDependencies": {
     "@nodegui/packer": "^1.4.1",
