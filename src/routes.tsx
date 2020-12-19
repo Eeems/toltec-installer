@@ -11,6 +11,7 @@ import BackupPrompt from "./pages/BackupPrompt";
 import SSHKeyCreate from "./pages/SSHKeyCreate";
 import InstallSSHKey from "./pages/InstallSSHKey";
 import Backup from "./pages/Backup";
+import Install from "./pages/Install";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function AppRoutes() {
@@ -34,6 +35,7 @@ export default function AppRoutes() {
         <Route exact path="/installsshkey" component={InstallSSHKey} />
         <Route exact path="/backupprompt" component={BackupPrompt} />
         <Route exact path="/backup" component={Backup} />
+        <Route exact path="/install" component={Install} />
         <Route component={Unknown} />
       </Switch>
     </ErrorBoundary>

@@ -99,7 +99,10 @@ async function disconnect() {
   await promise;
 }
 
-function exec(command: string): Promise<any> {
+function exec(
+  command: string,
+  onData: (d: string) => void = () => {}
+): Promise<any> {
   return new Promise(function (resolve, reject) {
     if (!connected) {
       reject("Not connected");
@@ -118,9 +121,11 @@ function exec(command: string): Promise<any> {
         })
         .on("data", function (data: any) {
           stdout.push(data);
+          onData(data);
         })
         .stderr.on("data", function (data: any) {
           stderr.push(data);
+          onData(data);
         });
     });
   });
