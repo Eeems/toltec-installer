@@ -19,7 +19,7 @@ import { exec } from "../ssh";
 import Spacer from "../components/Spacer";
 import { nextTick } from "process";
 
-export default function Backup() {
+export default function Launcher() {
   const [finished, setFinished] = React.useState(false);
   const labelRef = React.createRef();
   const scrollAreaRef = React.createRef();
@@ -30,9 +30,7 @@ export default function Backup() {
     const label = labelRef.current as QLabel;
     const scrollArea = scrollAreaRef.current as QScrollArea;
     scrollArea.setAlignment(AlignmentFlag.AlignBottom);
-    label.setText(
-      `Installing toltec onto your reMarkable ${device[device.length - 1]}...`
-    );
+    label.setText(`reMarkable ${device[device.length - 1]}...`);
     function log(text: string) {
       text = (text + "")
         .trim()
@@ -48,35 +46,7 @@ export default function Backup() {
         );
       }
     }
-    (async function () {
-      let res = await exec(`[ -d ~/.entware ]`);
-      if (res.code === 0) {
-        log("Entware install detected!");
-      }
-      res = await exec(`[ -f ~/bootstrap ]`);
-      if (res.code !== 0) {
-        log("Downloading bootstrap...");
-        res = await exec("wget http://toltec-dev.org/bootstrap", log);
-        if (res.code !== 0) {
-          log("Failed to download bootstrap");
-          return;
-        }
-      } else {
-        log("Bootstrap script found.");
-      }
-      log("Verifying bootstrap script...");
-      res = await exec(
-        `echo "cbe83d1ae2d3ef6291a2b57202bb59aace14f2f1849bbdb09552a7419995294a  bootstrap" | sha256sum -c`
-      );
-      if (res.code !== 0) {
-        log("bootstrap script failed verification!");
-        return;
-      }
-      log("Bootstrap script passed verification!");
-      await exec("/bin/bash bootstrap", log);
-      log("Done!");
-      setFinished(true);
-    })();
+    log("hello world");
   }, []);
   const device = location.state.device;
   return (
@@ -87,12 +57,17 @@ export default function Backup() {
       <View />
       <BoxView direction={Direction.LeftToRight}>
         <View />
-        <View />
-        <View />
         <Button
-          enabled={finished}
-          on={{ clicked: () => history.replace("/launcher", location.state) }}
-          text="Next"
+          //on={{ clicked: () => () }}
+          text="nao"
+        />
+        <Button
+          //on={{ clicked: () => () }}
+          text="Oxide"
+        />
+        <Button
+          //on={{ clicked: () => () }}
+          text="Oxide"
         />
       </BoxView>
     </BoxView>
