@@ -55,7 +55,7 @@ function connect(password?: string, sshKeyPath?: string): Promise<void> {
   } else if (sshKeyPath) {
     console.log(`Using explicit SSH key: ${sshKeyPath}`);
     config.privateKey = readFileSync(sshKeyPath);
-  } else {
+  } else if (existsSync(homedir() + "/.ssh/id_rsa")) {
     console.log("Using default SSH key");
     config.privateKey = readFileSync(homedir() + "/.ssh/id_rsa");
   }
